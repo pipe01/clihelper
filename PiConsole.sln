@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiConsole", "PiConsole\PiConsole.csproj", "{69C59412-1430-42B6-813D-E2A1DBE3689A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiConsole", "PiConsole\PiConsole.csproj", "{69C59412-1430-42B6-813D-E2A1DBE3689A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{3FE54F8E-475D-4850-A40C-D599A8B1916C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiConsoleTest", "PiConsoleTest\PiConsoleTest.csproj", "{B603730B-2A08-4C6E-B08C-2E45EDB68D94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{69C59412-1430-42B6-813D-E2A1DBE3689A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69C59412-1430-42B6-813D-E2A1DBE3689A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69C59412-1430-42B6-813D-E2A1DBE3689A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FE54F8E-475D-4850-A40C-D599A8B1916C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FE54F8E-475D-4850-A40C-D599A8B1916C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FE54F8E-475D-4850-A40C-D599A8B1916C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FE54F8E-475D-4850-A40C-D599A8B1916C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B603730B-2A08-4C6E-B08C-2E45EDB68D94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B603730B-2A08-4C6E-B08C-2E45EDB68D94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B603730B-2A08-4C6E-B08C-2E45EDB68D94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B603730B-2A08-4C6E-B08C-2E45EDB68D94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
