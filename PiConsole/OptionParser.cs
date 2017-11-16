@@ -5,6 +5,7 @@ using System.Linq;
 
 using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("PiConsoleTest")]
+[assembly: InternalsVisibleTo("Testing")]
 
 namespace PiConsole
 {
@@ -77,6 +78,8 @@ namespace PiConsole
             //Options that have already been seen will go here.
             List<Option> appearances = new List<Option>();
 
+            string restString = "";
+
             for (int i = 0; i < line.Length; i++)
             {
                 char currentChar = line[i];
@@ -91,7 +94,7 @@ namespace PiConsole
                     bool longOpt = nextChar == '-';
 
                     //Get the full option definition
-                    string optionDef = ReadUntilChar(line.Substring(i), ' ');
+                    string optionDef = ReadUntilChars(line.Substring(i), ' ');
 
                     //Skip option characters
                     i += optionDef.Length;
@@ -100,8 +103,11 @@ namespace PiConsole
                     optionDef = optionDef.TrimStart('-');
 
                     //Get the option argument, if any
-                    string optionArgs = GetOptionArgument(ReadUntilChar(line.Substring(i), '-'), out int argLength);
+                    string optionArgs = 
+                        GetOptionArgument(ReadUntilChars(line.Substring(i).Trim(), '-', ' '), out int argLength);
 
+                    //Advance loop by the length of the arguments
+                    i += argLength;
 
                     //Find the option in the option definitions
                     Option optionMatch = null;
@@ -126,22 +132,21 @@ namespace PiConsole
                         else
                             continue;
                     }
-                    else if ((optionMatch.HasArgument && optionArgs == null) || (!optionMatch.HasArgument && optionArgs != null))
+                    else if (optionMatch.HasArgument && optionArgs == null)
                     {
-                        //If we require arguments and we don't have them, or if we don't require arguments and
-                        //we do have them, the option is invalid
+                        //If we require arguments and we don't have them, the option is invalid
 
-                        string errorMsg = $"Argument mismatch at option '{optionDef}', column index {i}: ";
-
-                        if (optionMatch.HasArgument)
-                            errorMsg += "argument required.";
-                        else
-                            errorMsg += "argument not required.";
-
+                        string errorMsg = $"Argument mismatch at option '{optionDef}', column index {i}: argument required.";
+                        
                         if (_Configuration.ThrowOnInvalidOption)
                             throw new ParserException(errorMsg);
                         else
                             continue;
+                    }
+                    else if (!optionMatch.HasArgument && optionArgs != null)
+                    {
+                        //If we don't require arguments and we do have them, skip
+                        continue;
                     }
                     else if (appearances.Contains(optionMatch) && !optionMatch.CanAppearMultipleTimes)
                     {
@@ -153,8 +158,7 @@ namespace PiConsole
                             continue;
                     }
 
-                    i += argLength;
-
+                    
                     //Add option to seen option list
                     appearances.Add(optionMatch);
 
@@ -164,6 +168,10 @@ namespace PiConsole
                     OptionValue opt = new OptionValue(optionMatch, optionArgs);
 
                     yield return opt;
+                }
+                else
+                {
+                    restString += currentChar;
                 }
             }
         }
@@ -223,16 +231,32 @@ namespace PiConsole
         /// <summary>
         /// Reads a string until a certain unescaped character is found.
         /// </summary>
-        private string ReadUntilChar(string str, char ch)
+        private string ReadUntilChars(string str, params char[] ch)
         {
             string ret = "";
+            char quotes = '\0';
 
             for (int i = 0; i < str.Length; i++)
             {
                 char currentChar = str[i];
                 char lastChar = i > 0 ? str[i - 1] : '\0';
 
-                if (currentChar == ch && lastChar != '\\')
+                if (currentChar == '"' || currentChar == '\'')
+                {
+                    if (quotes == '\0')
+                    {
+                        quotes = currentChar;
+                    }
+                    else
+                    {
+                        quotes = '\0';
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (ch.Contains(currentChar) && lastChar != '\\' && quotes == '\0')
                 {
                     break;
                 }

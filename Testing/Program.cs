@@ -20,7 +20,7 @@ namespace Testing
 
         static void Main(string[] args)
         {
-            /*Parser parser = new Parser(new Parser.Configuration
+            OptionParser parser = new OptionParser(new OptionParser.Configuration
             {
                 ThrowOnInvalidOption = true,
                 ValidOptionDefinitions = new Option[]
@@ -31,9 +31,9 @@ namespace Testing
                 }
             });
 
-            var result = parser.ParseAll("-h -h -e 'lol' --output").ToList();*/
+            var result = parser.ParseAll("-e \"asdf lol\" hola").ToList();
 
-            Arguments.ThrowOnOptionError = true;
+            /*Arguments.ThrowOnOptionError = true;
             try
             {
                 var margs = Arguments.Parse<MyArgs>("-h hoi");
@@ -41,11 +41,12 @@ namespace Testing
             catch (ParserException ez)
             {
                 Console.WriteLine("Error while parsing: " + ez.Message);
-            }
+            }*/
             
-
             Console.WriteLine("Done");
             Console.ReadLine();
+
+
         }
     }
 }
