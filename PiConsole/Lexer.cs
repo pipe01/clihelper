@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace PiConsole
 {
-    internal class Lexer
+    internal static class Lexer
     {
-        public IEnumerable<Token> Parse(string line)
+        public static IEnumerable<Token> Parse(string line)
         {
-            OptionToken? lastOptionToken = null;
             line = line.Trim();
 
             for (int i = 0; i < line.Length; i++)
@@ -36,9 +35,8 @@ namespace PiConsole
                     i = afterOptionIndex + optionText.Length;
 
                     //Create and return token
-                    OptionToken token = new OptionToken(optionText);
-
-                    lastOptionToken = token;
+                    OptionToken token = new OptionToken(optionText, longOption);
+                    
                     yield return token;
                 }
                 //If we are starting a string
@@ -50,20 +48,8 @@ namespace PiConsole
                     //Skip index
                     i += length;
 
-                    //If we came across an option token
-                    if (lastOptionToken != null)
-                    {
-                        //Return a token argument
-                        yield return new OptionArgumentToken(lastOptionToken.Value, text);
-
-                        //Set last token to null
-                        lastOptionToken = null;
-                    }
-                    else
-                    {
-                        //Return a generic argument
-                        yield return new ArgumentToken(text);
-                    }
+                    //Return a generic argument
+                    yield return new ArgumentToken(text);
                 }
             }
         }

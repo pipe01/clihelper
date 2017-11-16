@@ -171,10 +171,7 @@ namespace PiConsoleTest
             {
                 new Option("a", null, "TestA", "Nothing", true)
             };
-            OptionParser parser = new OptionParser(new OptionParser.Configuration(options)
-            {
-                ThrowOnInvalidOption = true
-            });
+            OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
 
             string testLine = "-a";
 
@@ -186,16 +183,14 @@ namespace PiConsoleTest
         {
             Option[] options = new Option[]
             {
-                new Option("a", null, "TestA", "Nothing", false)
+                new Option("a", null, "TestA", "Nothing", false),
+                new Option("b", null, "TestA", "Nothing", false)
             };
-            OptionParser parser = new OptionParser(new OptionParser.Configuration(options)
-            {
-                ThrowOnInvalidOption = true
-            });
+            OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
 
-            string testLine = "-a argument";
+            string testLine = "-a argument -b";
 
-            //Assert.ThrowsException<ParserException>(() => parser.ParseAll(testLine).ToList());
+            Assert.ThrowsException<ParserException>(() => parser.ParseAll(testLine).ToList());
         }
 
         [TestMethod]
@@ -205,10 +200,7 @@ namespace PiConsoleTest
             {
                 new Option("a", null, "TestA", "Nothing", false, false)
             };
-            OptionParser parser = new OptionParser(new OptionParser.Configuration(options)
-            {
-                ThrowOnInvalidOption = true
-            });
+            OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
 
             string testLine = "-a -a";
             

@@ -26,11 +26,6 @@ namespace PiConsole
         public class Configuration
         {
             /// <summary>
-            /// Whether to throw an exception when an invalid option is found. Defaults to false.
-            /// </summary>
-            public bool ThrowOnInvalidOption { get; set; } = false;
-
-            /// <summary>
             /// List of the valid option definitions.
             /// </summary>
             public IEnumerable<Option> ValidOptionDefinitions { get; set; } = new List<Option>();
@@ -78,154 +73,73 @@ namespace PiConsole
             //Options that have already been seen will go here.
             List<Option> appearances = new List<Option>();
 
-            string restString = "";
+            List<Token> tokens = Lexer.Parse(line.Substring(start)).ToList();
+            OptionToken? lastOption = (OptionToken?)tokens
+                .Where(o => o is OptionToken)
+                .LastOrDefault();
 
-            for (int i = 0; i < line.Length; i++)
+            for (int i = 0; i < tokens.Count; i++)
             {
-                char currentChar = line[i];
-                char nextChar = i < line.Length - 1 ? line[i + 1] : '\0';
+                Token currentToken = tokens[i];
+                Token nextToken = null;
 
-                //Extract option chunk
+                //Try to get next token
+                if (i < tokens.Count - 1)
+                    nextToken = tokens[i + 1];
 
-                //We are starting an option
-                if (currentChar == '-')
+                //We are on an option token
+                if (currentToken is OptionToken optionToken)
                 {
-                    //Check if it's a long or short option
-                    bool longOpt = nextChar == '-';
+                    //Check if there is an argument
+                    ArgumentToken? argToken =
+                        nextToken is ArgumentToken ? (ArgumentToken?)nextToken : null;
+                    
+                    Option optionDefinition = null;
 
-                    //Get the full option definition
-                    string optionDef = line.Substring(i).ReadUntilChars(' ');
-
-                    //Skip option characters
-                    i += optionDef.Length;
-
-                    //Strip the dashes out
-                    optionDef = optionDef.TrimStart('-');
-
-                    //Get the option argument, if any
-                    string optionArgs = 
-                        GetOptionArgument(line.Substring(i).Trim().ReadUntilChars('-', ' '), out int argLength);
-
-                    //Advance loop by the length of the arguments
-                    i += argLength;
-
-                    //Find the option in the option definitions
-                    Option optionMatch = null;
-                    if (longOpt)
+                    //Get the option definition
+                    if (optionToken.Long)
                     {
-                        optionMatch = _Configuration.ValidOptionDefinitions
-                            .FirstOrDefault(o => o.LongOption.Equals(optionDef));
+                        optionDefinition = _Configuration.ValidOptionDefinitions
+                            .Where(o => o.LongOption.Equals(optionToken.Option))
+                            .SingleOrDefault();
                     }
                     else
                     {
-                        optionMatch = _Configuration.ValidOptionDefinitions
-                            .FirstOrDefault(o => o.ShortOption.Equals(optionDef));
+                        optionDefinition = _Configuration.ValidOptionDefinitions
+                            .Where(o => o.ShortOption.Equals(optionToken.Option))
+                            .SingleOrDefault();
                     }
 
-                    //Check if we found an option
-                    if (optionMatch == null)
-                    {
-                        //The option isn't on the valid option collection, throw brick
 
-                        if (_Configuration.ThrowOnInvalidOption)
-                            throw new ParserException($"Can't find option '{optionDef}'.");
-                        else
-                            continue;
-                    }
-                    else if (optionMatch.HasArgument && optionArgs == null)
-                    {
-                        //If we require arguments and we don't have them, the option is invalid
+                    //If the token isn't on the provided definitions list, throw
+                    if (optionDefinition == null)
+                        throw new ParserException($"Token '{optionToken.Option}' not found");
 
-                        string errorMsg = $"Argument mismatch at option '{optionDef}', column index {i}: argument required.";
-                        
-                        if (_Configuration.ThrowOnInvalidOption)
-                            throw new ParserException(errorMsg);
-                        else
-                            continue;
-                    }
-                    else if (!optionMatch.HasArgument && optionArgs != null)
-                    {
-                        //If we don't require arguments and we do have them, skip
-                        continue;
-                    }
-                    else if (appearances.Contains(optionMatch) && !optionMatch.CanAppearMultipleTimes)
-                    {
-                        //This option can only appear once, but it has appeared more than once
 
-                        if (_Configuration.ThrowOnInvalidOption)
-                            throw new ParserException($"Argument '{optionDef}' can only appear once.");
-                        else
-                            continue;
-                    }
-
+                    bool isLastOption = lastOption.HasValue && optionToken.Equals(lastOption.Value);
+                    bool hasArgumentToken = argToken != null;
+                    bool reqsArgument = optionDefinition.HasArgument;
                     
-                    //Add option to seen option list
-                    appearances.Add(optionMatch);
 
-                    //We have successfully checked the option
-                    //Create and return it
+                    //This option has already been specified but it can only appear once, throw
+                    if (appearances.Contains(optionDefinition) && !optionDefinition.CanAppearMultipleTimes)
+                        throw new ParserException($"Token '{optionToken.Option}' can only appear once.");
 
-                    OptionValue opt = new OptionValue(optionMatch, optionArgs);
+                    //We have an argument but we don't require it, and this isn't the last option, throw
+                    if ((!reqsArgument && hasArgumentToken) && !isLastOption)
+                        throw new ParserException($"Token '{optionToken.Option}' can't have an argument.");
 
-                    yield return opt;
-                }
-                else
-                {
-                    restString += currentChar;
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Tries to get the option's argument. If none, returns null.
-        /// </summary>
-        /// <param name="totalLength">The absolute length on <paramref name="str"/> of the argument.</param>
-        private string GetOptionArgument(string str, out int totalLength)
-        {
-            str = str.Trim();
+                    //We don't have an argument but we require it, throw
+                    if (!hasArgumentToken && reqsArgument)
+                        throw new ParserException($"Token '{optionToken.Option}' must have an argument.");
 
-            //There is no argument, return null.
-            if (str.Length == 0)
-            {
-                totalLength = -1;
-                return null;
-            }
 
-            string ret = "";
+                    //Add option to the appearances list
+                    appearances.Add(optionDefinition);
 
-            char[] stringDelimiters = new[] { '"', '\'' };
-            char currentDelimiter = '\0';
-            int length = -1;
-
-            for (int i = 0; i < str.Length; i++)
-            {
-                char currentChar = str[i];
-                
-                bool isDelimiter = stringDelimiters.Contains(currentChar);
-
-                //Check if we are on a string delimiter
-                if (isDelimiter && currentDelimiter == '\0')
-                {
-                   //We are starting a string, set the current delimiter
-                   currentDelimiter = currentChar;
-                }
-                else if (isDelimiter && currentDelimiter != '\0' && currentChar == currentDelimiter)
-                {
-                    //We are on a string and the current char is the string delimiter we are currently using
-                    //End the string
-
-                    length = i + 1;
-                    break;
-                }
-                else
-                {
-                    //It's a regular character, add it to the argument
-                    ret += currentChar;
+                    yield return new OptionValue(optionDefinition, argToken?.Text);
                 }
             }
-
-            totalLength = length;
-            return ret;
         }
     }
 }

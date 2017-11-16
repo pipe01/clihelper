@@ -11,7 +11,7 @@ namespace Testing
     {
         class MyArgs : Arguments
         {
-            [Option("h", "help", "help", "Shows help", false, false)]
+            [Option("h", "help", "help", "Shows help", false, true)]
             public bool ShowHelp { get; set; }
 
             [Option("e", "extract", "extract", "Extracts a file", true)]
@@ -32,18 +32,17 @@ namespace Testing
             });
 
             var result = parser.ParseAll("-e \"asdf lol\" hola").ToList();*/
-
-            /*Arguments.ThrowOnOptionError = true;
+            
             try
             {
-                var margs = Arguments.Parse<MyArgs>("-h hoi");
+                var margs = Arguments.Parse<MyArgs>("-h -e arg");
             }
             catch (ParserException ez)
             {
                 Console.WriteLine("Error while parsing: " + ez.Message);
-            }*/
+            }
 
-            var res = new Lexer().Parse("-e lol xd --hola").ToList();
+            //var res = Lexer.Parse("-e lol xd --hola").ToList();
 
             Console.WriteLine("Done");
             Console.ReadLine();

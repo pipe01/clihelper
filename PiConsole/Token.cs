@@ -14,25 +14,17 @@ namespace PiConsole
     internal struct OptionToken : Token
     {
         public string Option;
+        public bool Long;
+        public Guid ID;
 
-        public OptionToken(string option)
+        public OptionToken(string option, bool longOption)
         {
             this.Option = option;
+            this.Long = longOption;
+            this.ID = Guid.NewGuid();
         }
     }
-
-    internal struct OptionArgumentToken : Token
-    {
-        public OptionToken OptionToken;
-        public string Text;
-
-        public OptionArgumentToken(OptionToken option, string text)
-        {
-            this.OptionToken = option;
-            this.Text = text;
-        }
-    }
-
+    
     internal struct ArgumentToken : Token
     {
         public string Text;

@@ -9,12 +9,12 @@ namespace PiConsole
 {
     public abstract class Arguments
     {
-        /// <summary>
-        /// Throw when an option error is found? Defaults to true.
-        /// </summary>
-        public static bool ThrowOnOptionError { get; set; } = true;
+        private static bool ContainsKey<TKey, TValue>(List<KeyValuePair<TKey, TValue>> arr, TKey key)
+        {
+            return arr.Any(o => o.Key.Equals(key));
+        }
 
-        private static void ApplyReflection(object obj, Dictionary<string, string> fields)
+        private static void ApplyReflection(object obj, List<KeyValuePair<string, string>> fields)
         {
             Contract.Requires(obj != null);
             Contract.Requires(fields != null);
@@ -45,10 +45,10 @@ namespace PiConsole
                 //If the property's type is bool, we set it to whether the option is set or not
                 if (fieldType == typeof(bool))
                 {
-                    prop.SetValue(obj, fields.ContainsKey(optionName));
+                    prop.SetValue(obj, ContainsKey(fields, optionName));
                 }
                 //If it isn't bool, check if the property's option name is set
-                else if (!fields.ContainsKey(optionName))
+                else if (!ContainsKey(fields, optionName))
                 {
                     //throw new ArgumentException($"Option {optionName} not found!", nameof(fields));
 
@@ -66,7 +66,9 @@ namespace PiConsole
 
                     //It's all correct, set the property value
 
-                    string value = fields[optionName];
+                    string value = fields
+                        .Where(o => o.Key == optionName)
+                        .SingleOrDefault().Value;
 
                     prop.SetValue(obj, value);
                 }
@@ -166,10 +168,10 @@ namespace PiConsole
         {
             Contract.Requires(options != null);
             Contract.Requires(line != null);
-            
-            Dictionary<string, string> reflectionValues = Parse(line, options)
+
+            List<KeyValuePair<string, string>> reflectionValues = Parse(line, options)
                 .Select(o => new KeyValuePair<string, string>(o.Key.Name, o.Value))
-                .ToDictionary(o => o.Key, o => o.Value);
+                .ToList();
 
             T argsInstance = Activator.CreateInstance(typeof(T)) as T;
 
@@ -184,7 +186,7 @@ namespace PiConsole
         /// </summary>
         /// <param name="args">String array containing the arguments.</param>
         /// <param name="options">Option array.</param>
-        public static Dictionary<Option, string> Parse(string[] args, Option[] options)
+        public static List<KeyValuePair<Option, string>> Parse(string[] args, Option[] options)
         {
             //Join the arguments array
             string line = Join(args);
@@ -193,26 +195,23 @@ namespace PiConsole
         }
 
         /// <summary>
-        /// Parse arguments. The values will be returned as a (<see cref="Option"/>, string) dictionary.
+        /// Parse arguments. The values will be returned as a (<see cref="Option"/>, string) KeyValuePair list.
         /// </summary>
         /// <param name="line">Arguments line.</param>
         /// <param name="options">Option array.</param>
-        public static Dictionary<Option, string> Parse(string line, Option[] options)
+        public static List<KeyValuePair<Option, string>> Parse(string line, Option[] options)
         {
             Contract.Requires(options != null);
             Contract.Requires(line != null);
 
-            OptionParser parser = new OptionParser(new OptionParser.Configuration(options)
-            {
-                ThrowOnInvalidOption = ThrowOnOptionError
-            });
+            OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
             var values = parser.ParseAll(line).ToList();
 
-            Dictionary<Option, string> ret = new Dictionary<Option, string>();
+            List<KeyValuePair<Option, string>> ret = new List<KeyValuePair<Option, string>>();
 
             foreach (var item in values)
             {
-                ret.Add(item.Option, item.Argument);
+                ret.Add(new KeyValuePair<Option, string>(item.Option, item.Argument));
             }
 
             return ret;
