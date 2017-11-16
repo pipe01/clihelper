@@ -94,7 +94,7 @@ namespace PiConsole
                     bool longOpt = nextChar == '-';
 
                     //Get the full option definition
-                    string optionDef = ReadUntilChars(line.Substring(i), ' ');
+                    string optionDef = line.Substring(i).ReadUntilChars(' ');
 
                     //Skip option characters
                     i += optionDef.Length;
@@ -104,7 +104,7 @@ namespace PiConsole
 
                     //Get the option argument, if any
                     string optionArgs = 
-                        GetOptionArgument(ReadUntilChars(line.Substring(i).Trim(), '-', ' '), out int argLength);
+                        GetOptionArgument(line.Substring(i).Trim().ReadUntilChars('-', ' '), out int argLength);
 
                     //Advance loop by the length of the arguments
                     i += argLength;
@@ -225,45 +225,6 @@ namespace PiConsole
             }
 
             totalLength = length;
-            return ret;
-        }
-
-        /// <summary>
-        /// Reads a string until a certain unescaped character is found.
-        /// </summary>
-        private string ReadUntilChars(string str, params char[] ch)
-        {
-            string ret = "";
-            char quotes = '\0';
-
-            for (int i = 0; i < str.Length; i++)
-            {
-                char currentChar = str[i];
-                char lastChar = i > 0 ? str[i - 1] : '\0';
-
-                if (currentChar == '"' || currentChar == '\'')
-                {
-                    if (quotes == '\0')
-                    {
-                        quotes = currentChar;
-                    }
-                    else
-                    {
-                        quotes = '\0';
-                        break;
-                    }
-
-                    continue;
-                }
-
-                if (ch.Contains(currentChar) && lastChar != '\\' && quotes == '\0')
-                {
-                    break;
-                }
-
-                ret += currentChar;
-            }
-
             return ret;
         }
     }

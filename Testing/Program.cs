@@ -20,7 +20,7 @@ namespace Testing
 
         static void Main(string[] args)
         {
-            OptionParser parser = new OptionParser(new OptionParser.Configuration
+            /*OptionParser parser = new OptionParser(new OptionParser.Configuration
             {
                 ThrowOnInvalidOption = true,
                 ValidOptionDefinitions = new Option[]
@@ -31,7 +31,7 @@ namespace Testing
                 }
             });
 
-            var result = parser.ParseAll("-e \"asdf lol\" hola").ToList();
+            var result = parser.ParseAll("-e \"asdf lol\" hola").ToList();*/
 
             /*Arguments.ThrowOnOptionError = true;
             try
@@ -42,7 +42,9 @@ namespace Testing
             {
                 Console.WriteLine("Error while parsing: " + ez.Message);
             }*/
-            
+
+            var res = new Lexer().Parse("-e lol xd --hola").ToList();
+
             Console.WriteLine("Done");
             Console.ReadLine();
 
