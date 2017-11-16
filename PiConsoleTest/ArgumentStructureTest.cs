@@ -5,9 +5,9 @@ using PiConsole;
 namespace PiConsoleTest
 {
     [TestClass]
-    public class ArgumentsTest
+    public class ArgumentStructureTest
     {
-        class TestClass1 : Arguments
+        class TestClass1 : ArgumentStructure
         {
             [Option("testString")]
             public string TestString { get; set; }
@@ -16,7 +16,7 @@ namespace PiConsoleTest
             public bool TestBool { get; set; }
         }
 
-        class TestClass2 : Arguments
+        class TestClass2 : ArgumentStructure
         {
             [Option("a", "testString", "testString", "erhuithi", true)]
             public string TestString { get; set; }
@@ -31,7 +31,7 @@ namespace PiConsoleTest
         {
             string testString = "--testString 'hola' --testBool";
 
-            TestClass1 parsed = Arguments.Parse<TestClass1>(testString, new Option[]
+            TestClass1 parsed = ArgumentStructure.Parse<TestClass1>(testString, new Option[]
             {
                 new Option("a", "testString", "testString", "hoijo", true),
                 new Option("b", "testBool", "testBool", "edhroirtjho")
@@ -46,7 +46,7 @@ namespace PiConsoleTest
         {
             string testString = "--testString 'hola' --testBool";
 
-            TestClass2 parsed = Arguments.Parse<TestClass2>(testString);
+            TestClass2 parsed = ArgumentStructure.Parse<TestClass2>(testString);
 
             Assert.AreEqual("hola", parsed.TestString);
             Assert.IsTrue(parsed.TestBool);
@@ -58,7 +58,7 @@ namespace PiConsoleTest
         {
             string[] testArray = "--testString 'hola' --testBool".Split(' ');
 
-            TestClass1 parsed = Arguments.Parse<TestClass1>(testArray, new Option[]
+            TestClass1 parsed = ArgumentStructure.Parse<TestClass1>(testArray, new Option[]
             {
                 new Option("a", "testString", "testString", "hoijo", true),
                 new Option("b", "testBool", "testBool", "edhroirtjho")
@@ -73,7 +73,7 @@ namespace PiConsoleTest
         {
             string[] testArray = "--testString 'hola' --testBool".Split(' ');
 
-            TestClass2 parsed = Arguments.Parse<TestClass2>(testArray);
+            TestClass2 parsed = ArgumentStructure.Parse<TestClass2>(testArray);
 
             Assert.AreEqual("hola", parsed.TestString);
             Assert.IsTrue(parsed.TestBool);
@@ -91,7 +91,7 @@ namespace PiConsoleTest
                 new Option("b", "testBool", "testBool", "edhroirtjho")
             };
 
-            var parsed = Arguments.Parse(testString, options);
+            var parsed = ArgumentStructure.Parse(testString, options);
 
             //Assert.AreEqual("hola", parsed[options[0]]);
             //Assert.IsTrue(parsed.ContainsKey(options[1]));
@@ -108,10 +108,12 @@ namespace PiConsoleTest
                 new Option("b", "testBool", "testBool", "edhroirtjho")
             };
 
-            var parsed = Arguments.Parse(testArray, options);
+            var parsed = ArgumentStructure.Parse(testArray, options);
 
             //Assert.AreEqual("hola", parsed[options[0]]);
             //Assert.IsTrue(parsed.ContainsKey(options[1]));
         }
+
+        //TODO Add tests for command arguments
     }
 }

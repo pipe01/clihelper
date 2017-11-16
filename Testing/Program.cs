@@ -9,9 +9,9 @@ namespace Testing
 {
     class Program
     {
-        class MyArgs : Arguments
+        class MyArgs : ArgumentStructure
         {
-            [Option("h", "help", "help", "Shows help", false, true)]
+            [Option("h", "help", "help", "Shows help", false, false)]
             public bool ShowHelp { get; set; }
 
             [Option("e", "extract", "extract", "Extracts a file", true)]
@@ -35,7 +35,9 @@ namespace Testing
             
             try
             {
-                var margs = Arguments.Parse<MyArgs>("-h -e arg");
+                var margs = ArgumentStructure.Parse<MyArgs>("'argumento lol' hola");
+                
+
             }
             catch (ParserException ez)
             {

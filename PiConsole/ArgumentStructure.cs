@@ -7,8 +7,9 @@ using System.Reflection;
 
 namespace PiConsole
 {
-    public abstract class Arguments
+    public abstract class ArgumentStructure
     {
+        #region Static
         private static bool ContainsKey<TKey, TValue>(List<KeyValuePair<TKey, TValue>> arr, TKey key)
         {
             return arr.Any(o => o.Key.Equals(key));
@@ -75,7 +76,7 @@ namespace PiConsole
             }
         }
 
-        private static IEnumerable<Option> GetOptionDefinitions<T>() where T : Arguments
+        private static IEnumerable<Option> GetOptionDefinitions<T>() where T : ArgumentStructure
         {
             Type objType = typeof(T);
             PropertyInfo[] properties = objType.GetProperties();
@@ -122,7 +123,7 @@ namespace PiConsole
         /// </summary>
         /// <typeparam name="T"><see cref="Arguments"/> class containing option definitions.</typeparam>
         /// <param name="args">String array containing the arguments.</param>
-        public static T Parse<T>(string[] args) where T : Arguments
+        public static T Parse<T>(string[] args) where T : ArgumentStructure
         {
             //Get option definitions from the Arguments class
             Option[] options = GetOptionDefinitions<T>().ToArray();
@@ -136,7 +137,7 @@ namespace PiConsole
         /// <typeparam name="T"><see cref="Arguments"/> derived class.</typeparam>
         /// <param name="args">String array containing the arguments.</param>
         /// <param name="options">Option array.</param>
-        public static T Parse<T>(string[] args, Option[] options) where T : Arguments
+        public static T Parse<T>(string[] args, Option[] options) where T : ArgumentStructure
         {
             //Join the arguments array
             string line = Join(args);
@@ -150,7 +151,7 @@ namespace PiConsole
         /// </summary>
         /// <typeparam name="T"><see cref="Arguments"/> class containing option definitions.</typeparam>
         /// <param name="line">Arguments line.</param>
-        public static T Parse<T>(string line) where T : Arguments
+        public static T Parse<T>(string line) where T : ArgumentStructure
         {
             //Get option definitions from the Arguments class
             Option[] options = GetOptionDefinitions<T>().ToArray();
@@ -164,18 +165,27 @@ namespace PiConsole
         /// <typeparam name="T"><see cref="Arguments"/> derived class.</typeparam>
         /// <param name="line">String line containing all the arguments.</param>
         /// <param name="options">Option array.</param>
-        public static T Parse<T>(string line, Option[] options) where T : Arguments
+        public static T Parse<T>(string line, Option[] options) where T : ArgumentStructure
         {
             Contract.Requires(options != null);
             Contract.Requires(line != null);
 
             List<KeyValuePair<string, string>> reflectionValues = Parse(line, options)
-                .Select(o => new KeyValuePair<string, string>(o.Key.Name, o.Value))
+                .Select(o => new KeyValuePair<string, string>(o.Key?.Name, o.Value))
                 .ToList();
 
             T argsInstance = Activator.CreateInstance(typeof(T)) as T;
 
-            ApplyReflection(argsInstance, reflectionValues);
+            var filteredValues = reflectionValues
+                .Where(o => o.Key != null)
+                .ToList();
+
+            ApplyReflection(argsInstance, filteredValues);
+
+            argsInstance.Arguments = reflectionValues
+                .Where(o => o.Key == null)
+                .Select(o => o.Value)
+                .ToArray();
 
             return argsInstance;
         }
@@ -216,5 +226,8 @@ namespace PiConsole
 
             return ret;
         }
+        #endregion
+
+        public string[] Arguments { get; private set; }
     }
 }

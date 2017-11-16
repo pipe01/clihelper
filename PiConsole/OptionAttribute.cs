@@ -5,7 +5,7 @@ using System.Text;
 namespace PiConsole
 {
     /// <summary>
-    /// This property represents an option in an <see cref="Arguments"/> object.
+    /// This property represents an option in an <see cref="ArgumentStructure"/> object.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class OptionAttribute : Attribute

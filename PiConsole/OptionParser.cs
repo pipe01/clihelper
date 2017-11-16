@@ -93,7 +93,11 @@ namespace PiConsole
                     //Check if there is an argument
                     ArgumentToken? argToken =
                         nextToken is ArgumentToken ? (ArgumentToken?)nextToken : null;
-                    
+
+                    //If there is an argument token behind, skip it
+                    if (argToken != null)
+                        i++;
+
                     Option optionDefinition = null;
 
                     //Get the option definition
@@ -138,6 +142,10 @@ namespace PiConsole
                     appearances.Add(optionDefinition);
 
                     yield return new OptionValue(optionDefinition, argToken?.Text);
+                }
+                else if (currentToken is ArgumentToken argToken)
+                {
+                    yield return new OptionValue(null, argToken.Text);
                 }
             }
         }
