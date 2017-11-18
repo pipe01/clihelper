@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PiConsole
+namespace CliHelper
 {
     internal static class Lexer
     {
@@ -24,7 +24,7 @@ namespace PiConsole
                 //If we are starting an option
                 if (currentChar == '-')
                 {
-                    //Check if it's a long option (--x)
+                    //Check if it's a long option (--xyz)
                     bool longOption = nextChar == '-';
 
                     //Get the option string without the dashes

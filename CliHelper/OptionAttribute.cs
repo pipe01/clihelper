@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PiConsole
+namespace CliHelper
 {
     /// <summary>
     /// This property represents an option in an <see cref="ArgumentStructure"/> object.

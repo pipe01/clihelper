@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq;
 using System.Reflection;
 
-namespace PiConsole
+namespace CliHelper
 {
     public abstract class ArgumentStructure
     {
@@ -15,6 +15,16 @@ namespace PiConsole
             return arr.Any(o => o.Key.Equals(key));
         }
 
+        /// <summary>
+        /// Sets an object's properties. <para/>
+        /// If any value in the list is null and the property is boolean,
+        /// it will be set to false. If any property is boolean but the value isn't null, it will
+        /// be set to true. If any property is string and the value is null, an exception will be thrown.
+        /// If any property's value isn't string or boolean, an exception will be thrown.
+        /// </summary>
+        /// <param name="obj">The object to modify.</param>
+        /// <param name="fields">The properties.</param>
+        /// <exception cref="ArgumentException"></exception>
         private static void ApplyReflection(object obj, List<KeyValuePair<string, string>> fields)
         {
             Contract.Requires(obj != null);
@@ -76,7 +86,13 @@ namespace PiConsole
             }
         }
 
-        private static IEnumerable<Option> GetOptionDefinitions<T>() where T : ArgumentStructure
+        /// <summary>
+        /// Loops through all of <typeparamref name="T"/>'s properties and extracts their options.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="strict">If any property without an option definition is found and this is
+        /// false, an exception will be thrown.</param>
+        private static IEnumerable<Option> GetOptionDefinitions<T>(bool strict = false) where T : ArgumentStructure
         {
             Type objType = typeof(T);
             PropertyInfo[] properties = objType.GetProperties();
@@ -86,18 +102,24 @@ namespace PiConsole
                 //Try to get OptionAttribute
                 OptionAttribute optAttribute = prop.GetCustomAttribute<OptionAttribute>();
 
-                if (optAttribute == null)
-                    continue;
+                if (optAttribute == null) //TODO Throw exception
+                    throw new ArgumentException("Property without option found.");
 
                 //Check if it contains an option definition
                 if (optAttribute.OptionDefinition == null)
-                    continue;
+                    throw new ArgumentException("Option property without definition found.");
 
                 //It does contain one, return it
                 yield return optAttribute.OptionDefinition;
             }
         }
 
+        /// <summary>
+        /// Joins a string array into a single string. If any string in the array contains spaces, it will be
+        /// escaped using quotes.
+        /// </summary>
+        /// <param name="arr">Array containing the strings to be joined.</param>
+        /// <returns></returns>
         private static string Join(string[] arr)
         {
             string line = "";
@@ -126,13 +148,13 @@ namespace PiConsole
         public static T Parse<T>(string[] args) where T : ArgumentStructure
         {
             //Get option definitions from the Arguments class
-            Option[] options = GetOptionDefinitions<T>().ToArray();
+            Option[] options = GetOptionDefinitions<T>(strict: true).ToArray();
 
             return Parse<T>(args, options);
         }
 
         /// <summary>
-        /// Parse arguments.
+        /// Parse arguments with explicit options..
         /// </summary>
         /// <typeparam name="T"><see cref="Arguments"/> derived class.</typeparam>
         /// <param name="args">String array containing the arguments.</param>
@@ -154,13 +176,13 @@ namespace PiConsole
         public static T Parse<T>(string line) where T : ArgumentStructure
         {
             //Get option definitions from the Arguments class
-            Option[] options = GetOptionDefinitions<T>().ToArray();
+            Option[] options = GetOptionDefinitions<T>(strict: true).ToArray();
 
             return Parse<T>(line, options);
         }
 
         /// <summary>
-        /// Parse arguments.
+        /// Parse arguments with explicit options.
         /// </summary>
         /// <typeparam name="T"><see cref="Arguments"/> derived class.</typeparam>
         /// <param name="line">String line containing all the arguments.</param>
