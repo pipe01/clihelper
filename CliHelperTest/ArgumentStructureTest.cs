@@ -124,18 +124,34 @@ namespace PiConsoleTest
             //Assert.IsTrue(parsed.ContainsKey(options[1]));
         }
 
+        
+        [TestMethod]
+        public void CommandWithArguments()
+        {
+            var result = ArgumentStructure.Parse<TestClass2>("argument1 'argument 2'");
 
-        //TODO Add tests for command arguments
+            string[] expected = new[] { "argument1", "argument 2" };
+
+            bool areEqual = true;
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (result.Arguments[i] != expected[i])
+                    areEqual = false;
+            }
+
+            Assert.IsTrue(areEqual);
+        }
 
         
         [TestMethod]
-        public void ArgumentClassWithoutOptionsShouldThrow()
+        public void ArgumentStructureWithoutOptionsShouldThrow()
         {
             Assert.ThrowsException<ArgumentException>(() => ArgumentStructure.Parse<TestClass3>(""));
         }
 
         [TestMethod]
-        public void ArgumentClassWithoutOptionDefinitionsShouldThrow()
+        public void ArgumentStructureWithoutOptionDefinitionsShouldThrow()
         {
             Assert.ThrowsException<ArgumentException>(() => ArgumentStructure.Parse<TestClass4>(""));
         }

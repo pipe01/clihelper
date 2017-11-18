@@ -99,6 +99,10 @@ namespace CliHelper
 
             foreach (var prop in properties)
             {
+                //Skip the Arguments property
+                if (prop.Name == nameof(Arguments))
+                    continue;
+
                 //Try to get OptionAttribute
                 OptionAttribute optAttribute = prop.GetCustomAttribute<OptionAttribute>();
 
