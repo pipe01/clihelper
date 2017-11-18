@@ -143,8 +143,8 @@ namespace CliHelper
 
             return line.TrimEnd();
         }
-
-
+        
+        #region Parse
         /// <summary>
         /// Get option definitions from <typeparamref name="T"/> and parse arguments.
         /// </summary>
@@ -252,6 +252,50 @@ namespace CliHelper
             }
 
             return ret;
+        }
+        #endregion
+        
+        public static string GetCommandUsage<T>(string programName = null, int spacing = 4) where T : ArgumentStructure
+        {
+            StringBuilder builder = new StringBuilder();
+
+            if (programName != null)
+                builder.AppendLine(programName + " [options]"); //TODO Get arguments and append their names
+
+            builder.AppendLine("Usage:");
+
+            var options = GetOptionDefinitions<T>();
+            
+            int maxLineLength = options
+                .Select(o => GetLine(o).Length)
+                .Max() + spacing;
+
+            foreach (var option in options)
+            {
+                string line = GetLine(option);
+
+                int length = line.Length;
+                int spaces = maxLineLength - length;
+
+                string space = new string(' ', spaces);
+
+                line += space;
+                line += option.Usage;
+
+                builder.AppendLine(line);
+            }
+
+            return builder.ToString();
+        }
+
+        private static string GetLine(Option option)
+        {
+            string line = $"  -{option.ShortOption}";
+
+            if (option.LongOption != null)
+                line += $", --{option.LongOption}";
+            
+            return line;
         }
         #endregion
 

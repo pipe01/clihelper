@@ -33,6 +33,9 @@ namespace Testing
 
             var result = parser.ParseAll("-h 'argumento lol' -e hola").ToList();*/
 
+            string usage = ArgumentStructure.GetCommandUsage<MyArgs>();
+            Console.WriteLine(usage);
+
             var margs = ArgumentStructure.Parse<MyArgs>("-h argumento lol hola");
             
             //var res = Lexer.Parse("-e lol xd --hola").ToList();
