@@ -1,4 +1,4 @@
-﻿using PiConsole;
+﻿using CliHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +22,8 @@ namespace Testing
         {
             /*OptionParser parser = new OptionParser(new OptionParser.Configuration
             {
-                ThrowOnInvalidOption = true,
-                ValidOptionDefinitions = new Option[]
+                AllowArgumentsBetweenOptions = true,
+                OptionDefinitions = new Option[]
                 {
                     new Option("h", "help", "Help", "Shows help", false, false),
                     new Option("o", "output", "Output", "Show output", false),
@@ -31,19 +31,10 @@ namespace Testing
                 }
             });
 
-            var result = parser.ParseAll("-e \"asdf lol\" hola").ToList();*/
+            var result = parser.ParseAll("-h 'argumento lol' -e hola").ToList();*/
+
+            var margs = ArgumentStructure.Parse<MyArgs>("-h argumento lol hola");
             
-            try
-            {
-                var margs = ArgumentStructure.Parse<MyArgs>("'argumento lol' hola");
-                
-
-            }
-            catch (ParserException ez)
-            {
-                Console.WriteLine("Error while parsing: " + ez.Message);
-            }
-
             //var res = Lexer.Parse("-e lol xd --hola").ToList();
 
             Console.WriteLine("Done");

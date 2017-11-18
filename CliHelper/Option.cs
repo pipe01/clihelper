@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Text;
 
-namespace PiConsole
+namespace CliHelper
 {
     /// <summary>
     /// Represents an option in the command line arguments
@@ -57,6 +58,11 @@ namespace PiConsole
         public Option(string shortOpt, string longOpt, string name, string usage, bool hasArgument = false,
             bool multipleTimes = true)
         {
+            if (shortOpt == null) throw new ArgumentException("Short option must not be null!", nameof(shortOpt));
+            if (shortOpt == "") throw new ArgumentException("Short option must not be empty!", nameof(shortOpt));
+            if (name == null) throw new ArgumentException("Option name must not be null!", nameof(name));
+            if (name == "") throw new ArgumentException("Option name must not be empty!", nameof(name));
+
             this.ShortOption = shortOpt;
             this.LongOption = longOpt;
             this.Name = name;

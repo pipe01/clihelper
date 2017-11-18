@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PiConsole;
+using CliHelper;
 
 namespace PiConsoleTest
 {
@@ -25,6 +25,16 @@ namespace PiConsoleTest
             public bool TestBool { get; set; }
         }
 
+        class TestClass3 : ArgumentStructure
+        {
+            public string NonOptionProperty { get; set; }
+        }
+
+        class TestClass4 : ArgumentStructure
+        {
+            [Option("hola")]
+            public string NonDefinedOptionProperty { get; set; }
+        }
 
         [TestMethod]
         public void ReflectionStringExplicitOptions()
@@ -114,6 +124,20 @@ namespace PiConsoleTest
             //Assert.IsTrue(parsed.ContainsKey(options[1]));
         }
 
+
         //TODO Add tests for command arguments
+
+        
+        [TestMethod]
+        public void ArgumentClassWithoutOptionsShouldThrow()
+        {
+            Assert.ThrowsException<ArgumentException>(() => ArgumentStructure.Parse<TestClass3>(""));
+        }
+
+        [TestMethod]
+        public void ArgumentClassWithoutOptionDefinitionsShouldThrow()
+        {
+            Assert.ThrowsException<ArgumentException>(() => ArgumentStructure.Parse<TestClass4>(""));
+        }
     }
 }

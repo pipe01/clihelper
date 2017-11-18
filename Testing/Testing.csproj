@@ -49,9 +49,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PiConsole\PiConsole.csproj">
+    <ProjectReference Include="..\CliHelper\CliHelper.csproj">
       <Project>{69c59412-1430-42b6-813d-e2a1dbe3689a}</Project>
-      <Name>PiConsole</Name>
+      <Name>CliHelper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

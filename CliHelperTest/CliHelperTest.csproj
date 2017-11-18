@@ -7,8 +7,8 @@
     <ProjectGuid>{B603730B-2A08-4C6E-B08C-2E45EDB68D94}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PiConsoleTest</RootNamespace>
-    <AssemblyName>PiConsoleTest</AssemblyName>
+    <RootNamespace>CliHelperTest</RootNamespace>
+    <AssemblyName>CliHelperTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -48,7 +48,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ParserTest.cs" />
+    <Compile Include="OptionParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ArgumentStructureTest.cs" />
   </ItemGroup>
@@ -56,9 +56,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PiConsole\PiConsole.csproj">
+    <ProjectReference Include="..\CliHelper\CliHelper.csproj">
       <Project>{69C59412-1430-42B6-813D-E2A1DBE3689A}</Project>
-      <Name>PiConsole</Name>
+      <Name>CliHelper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

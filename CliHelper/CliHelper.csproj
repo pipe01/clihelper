@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>net451</TargetFrameworks>
+    <AssemblyName>CliHelper</AssemblyName>
+    <RootNamespace>CliHelper</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
   </ItemGroup>

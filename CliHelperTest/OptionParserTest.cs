@@ -1,12 +1,12 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PiConsole;
+using CliHelper;
 using System.Linq;
 
 namespace PiConsoleTest
 {
     [TestClass]
-    public class ParserTest
+    public class OptionParserTest
     {
         [TestMethod]
         public void SingleSimpleShortOption()
@@ -179,22 +179,37 @@ namespace PiConsoleTest
         }
 
         [TestMethod]
-        public void OptionWithArgumentShouldFail()
+        public void OptionWithArgumentShouldNotThrow()
         {
             Option[] options = new Option[]
             {
                 new Option("a", null, "TestA", "Nothing", false),
-                new Option("b", null, "TestA", "Nothing", false)
+                new Option("b", null, "TestB", "Nothing", false)
             };
             OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
 
             string testLine = "-a argument -b";
 
-            Assert.ThrowsException<ParserException>(() => parser.ParseAll(testLine).ToList());
+            parser.ParseAll(testLine).ToList();
         }
 
         [TestMethod]
-        public void MultipleOptionShouldFail()
+        public void OptionWithArgumentAtEndShouldNotThrow()
+        {
+            Option[] options = new Option[]
+            {
+                new Option("a", null, "TestA", "Nothing", false)
+            };
+            OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
+
+            string testLine = "-a argument";
+
+            parser.ParseAll(testLine).ToList();
+        }
+
+
+        [TestMethod]
+        public void MultipleOptionShouldThrow()
         {
             Option[] options = new Option[]
             {
@@ -205,6 +220,43 @@ namespace PiConsoleTest
             string testLine = "-a -a";
             
             Assert.ThrowsException<ParserException>(() => parser.ParseAll(testLine).ToList());
+        }
+
+        [TestMethod]
+        public void ArgumentBetweenOptionsShouldThrow()
+        {
+            Option[] options = new Option[]
+            {
+                new Option("a", null, "TestA", "Nothing", false)
+            };
+            OptionParser parser = new OptionParser(new OptionParser.Configuration(options)
+            {
+                AllowArgumentsBetweenOptions = false
+            });
+
+            string testLine = "-a hola -a";
+
+            Assert.ThrowsException<ParserException>(() => parser.ParseAll(testLine).ToList());
+        }
+
+        [TestMethod]
+        public void DuplicateOptionDefinitionShouldThrow()
+        {
+            Option optA =  new Option("a", null, "a", "");
+            Option optAA = new Option("a", "oi", "rth", "");
+            Option optB =  new Option("b", "dup", "b", "");
+            Option optC =  new Option("c", "dup", "c", "");
+            Option optD =  new Option("d", null, "dup", "");
+            Option optE =  new Option("e", null, "dup", "");
+
+            Assert.ThrowsException<OptionException>(() => Create(optA, optAA));
+            Assert.ThrowsException<OptionException>(() => Create(optB, optC));
+            Assert.ThrowsException<OptionException>(() => Create(optD, optE));
+
+            void Create(params Option[] opts)
+            {
+                new OptionParser(new OptionParser.Configuration(opts));
+            }
         }
     }
 }
