@@ -11,7 +11,7 @@ namespace Testing
     {
         class MyArgs : ArgumentStructure
         {
-            [Option("h", "help", "help", "Shows help", false, false)]
+            [Option("h", "help", "help", "Shows help", false, multipleTimes: false)]
             public bool ShowHelp { get; set; }
 
             [Option("e", "extract", "extract", "Extracts a file", true)]

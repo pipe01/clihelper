@@ -67,12 +67,12 @@ namespace CliHelper
             CheckEmpty(shortOpt, "Short option", nameof(shortOpt));
             CheckEmpty(name, "Option name", nameof(name));
             
-
             this.ShortOption = shortOpt;
             this.LongOption = longOpt;
             this.Name = name;
             this.Usage = usage;
             this.HasArgument = hasArgument;
+            this.ArgumentName = argName;
             this.CanAppearMultipleTimes = multipleTimes;
         }
 

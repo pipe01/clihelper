@@ -27,14 +27,15 @@ namespace CliHelper
         /// </summary>
         /// <param name="shortOpt">Short option. E.g., "e".</param>
         /// <param name="longOpt">Long option. E.g., "extract". Can be null.</param>
-        /// <param name="name">Name. E.g., "extract"</param>
-        /// <param name="usage">Option usage. E.g., "Extracts a file"</param>
+        /// <param name="name">Name. E.g., "extractFile".</param>
+        /// <param name="usage">Option usage. E.g., "Extracts a file".</param>
         /// <param name="hasArgument">Does this option have arguments?</param>
+        /// <param name="argName">Argument name. E.g., "filename".</param>
         /// <param name="multipleTimes">Can this option appear more than once?</param>
         public OptionAttribute(string shortOpt, string longOpt, string name, string usage, bool hasArgument = false,
-            bool multipleTimes = true) : this(name)
+            string argName = null, bool multipleTimes = true) : this(name)
         {
-            this.OptionDefinition = new Option(shortOpt, longOpt, name, usage, hasArgument, multipleTimes: multipleTimes);
+            this.OptionDefinition = new Option(shortOpt, longOpt, name, usage, hasArgument, argName, multipleTimes);
         }
     }
 }
