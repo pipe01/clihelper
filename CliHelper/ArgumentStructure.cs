@@ -255,7 +255,15 @@ namespace CliHelper
         }
         #endregion
         
-        public static string GetCommandUsage<T>(string programName = null, int spacing = 4) where T : ArgumentStructure
+        /// <summary>
+        /// Get a command's usage.
+        /// </summary>
+        /// <typeparam name="T">Command argument structure.</typeparam>
+        /// <param name="programName">The program's command line name. If null, the first line is skipped.</param>
+        /// <param name="spacing">The spacing between options and usage.</param>
+        /// <param name="multipleIndication">Append (+) to those commands that can be passed more than once.</param>
+        public static string GetCommandUsage<T>(string programName = null, int spacing = 4,
+            bool multipleIndication = true) where T : ArgumentStructure
         {
             StringBuilder builder = new StringBuilder();
 
@@ -281,6 +289,9 @@ namespace CliHelper
 
                 line += space;
                 line += option.Usage;
+
+                if (option.CanAppearMultipleTimes && multipleIndication)
+                    line += " (+)";
 
                 builder.AppendLine(line);
             }
