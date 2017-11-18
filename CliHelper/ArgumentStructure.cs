@@ -92,6 +92,7 @@ namespace CliHelper
         /// <typeparam name="T"></typeparam>
         /// <param name="strict">If any property without an option definition is found and this is
         /// false, an exception will be thrown.</param>
+        /// <exception cref="ArgumentException"></exception>
         private static IEnumerable<Option> GetOptionDefinitions<T>(bool strict = false) where T : ArgumentStructure
         {
             Type objType = typeof(T);
@@ -106,7 +107,7 @@ namespace CliHelper
                 //Try to get OptionAttribute
                 OptionAttribute optAttribute = prop.GetCustomAttribute<OptionAttribute>();
 
-                if (optAttribute == null) //TODO Throw exception
+                if (optAttribute == null)
                     throw new ArgumentException("Property without option found.");
 
                 //Check if it contains an option definition

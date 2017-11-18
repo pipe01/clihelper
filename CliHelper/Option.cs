@@ -26,15 +26,20 @@ namespace CliHelper
         public string Name { get; set; }
 
         /// <summary>
-        /// The option's usage. E.g., "Extracts a file."
+        /// The option's usage. E.g., "Extracts a file.". Can be null
         /// </summary>
         public string Usage { get; set; }
-        
+
         /// <summary>
         /// True if the option has to have an argument. E.g., for "-e 'file.txt'" this would be true,
         /// for "-h", this would be false.
         /// </summary>
         public bool HasArgument { get; set; }
+
+        /// <summary>
+        /// The option's argument name. Can be null.
+        /// </summary>
+        public string ArgumentName { get; set; }
 
         /// <summary>
         /// Whether this option can appear multiple times.
@@ -51,17 +56,17 @@ namespace CliHelper
         /// </summary>
         /// <param name="shortOpt">Short option. E.g., "e".</param>
         /// <param name="longOpt">Long option. E.g., "extract". Can be null.</param>
-        /// <param name="name">Name. E.g., "extract"</param>
-        /// <param name="usage">Option usage. E.g., "Extracts a file"</param>
+        /// <param name="name">Name. E.g., "extractFile".</param>
+        /// <param name="usage">Option usage. E.g., "Extracts a file".</param>
+        /// <param name="argName">Argument name. E.g., "filename".</param>
         /// <param name="hasArgument">Does this option have arguments?</param>
         /// <param name="multipleTimes">Can this option appear more than once?</param>
-        public Option(string shortOpt, string longOpt, string name, string usage, bool hasArgument = false,
-            bool multipleTimes = true)
+        public Option(string shortOpt, string longOpt, string name, string usage, string argName,
+            bool hasArgument = false, bool multipleTimes = true)
         {
-            if (shortOpt == null) throw new ArgumentException("Short option must not be null!", nameof(shortOpt));
-            if (shortOpt == "") throw new ArgumentException("Short option must not be empty!", nameof(shortOpt));
-            if (name == null) throw new ArgumentException("Option name must not be null!", nameof(name));
-            if (name == "") throw new ArgumentException("Option name must not be empty!", nameof(name));
+            CheckEmpty(shortOpt, "Short option", nameof(shortOpt));
+            CheckEmpty(name, "Option name", nameof(name));
+            
 
             this.ShortOption = shortOpt;
             this.LongOption = longOpt;
@@ -69,6 +74,12 @@ namespace CliHelper
             this.Usage = usage;
             this.HasArgument = hasArgument;
             this.CanAppearMultipleTimes = multipleTimes;
+        }
+
+        private void CheckEmpty(string str, string name, string varName)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+                throw new ArgumentException(name + " must not be empty.", varName);
         }
     }
 }
