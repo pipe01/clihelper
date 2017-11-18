@@ -61,12 +61,17 @@ namespace CliHelper
         /// <param name="hasArgument">Does this option have arguments?</param>
         /// <param name="argName">Argument name. E.g., "filename".</param>
         /// <param name="multipleTimes">Can this option appear more than once?</param>
+        /// <exception cref="ArgumentException"></exception>
         public Option(string shortOpt, string longOpt, string name, string usage,
             bool hasArgument = false, string argName = null, bool multipleTimes = true)
         {
             CheckEmpty(shortOpt, "Short option", nameof(shortOpt));
             CheckEmpty(name, "Option name", nameof(name));
-            
+
+            //If the option has an argument, require an argument name
+            if (CheckEmpty(argName, "Argument name", nameof(argName), false) && hasArgument)
+                throw new ArgumentException("Argument name required.", nameof(argName));
+
             this.ShortOption = shortOpt;
             this.LongOption = longOpt;
             this.Name = name;
@@ -76,10 +81,19 @@ namespace CliHelper
             this.CanAppearMultipleTimes = multipleTimes;
         }
 
-        private void CheckEmpty(string str, string name, string varName)
+        /// <summary>
+        /// Checks if a string is null or empty.
+        /// If the string is empty, returns false.
+        /// If the string is empty and <paramref name="throwException"/> is true, throws an exception.
+        /// </summary>
+        private bool CheckEmpty(string str, string name, string varName, bool throwException = true)
         {
-            if (string.IsNullOrWhiteSpace(str))
+            bool check = string.IsNullOrWhiteSpace(str);
+
+            if (check && throwException)
                 throw new ArgumentException(name + " must not be empty.", varName);
+
+            return !check;
         }
     }
 }
