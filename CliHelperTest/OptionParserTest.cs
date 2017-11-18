@@ -213,7 +213,7 @@ namespace PiConsoleTest
         {
             Option[] options = new Option[]
             {
-                new Option("a", null, "TestA", "Nothing", false, false)
+                new Option("a", null, "TestA", "Nothing", false, multipleTimes:false)
             };
             OptionParser parser = new OptionParser(new OptionParser.Configuration(options));
 

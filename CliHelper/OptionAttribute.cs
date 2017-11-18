@@ -34,7 +34,7 @@ namespace CliHelper
         public OptionAttribute(string shortOpt, string longOpt, string name, string usage, bool hasArgument = false,
             bool multipleTimes = true) : this(name)
         {
-            this.OptionDefinition = new Option(shortOpt, longOpt, name, usage, hasArgument, multipleTimes);
+            this.OptionDefinition = new Option(shortOpt, longOpt, name, usage, hasArgument, multipleTimes: multipleTimes);
         }
     }
 }
