@@ -9,6 +9,26 @@ namespace CliHelper
 {
     public abstract class ArgumentStructure
     {
+        public struct ArgumentDefinition
+        {
+            public string Name;
+            public bool Optional;
+
+            public ArgumentDefinition(string name, bool optional)
+            {
+                this.Name = name;
+                this.Optional = optional;
+            }
+        }
+
+        public class Configuration
+        {
+            /// <summary>
+            /// The list of arguments that don't belong to an option. E.g., "extract.exe --optionWithoutArgs [one of these arguments] [another one]".
+            /// </summary>
+            public IList<ArgumentDefinition> Arguments { get; set; } = new List<ArgumentDefinition>();
+        }
+
         #region Static
         private static bool ContainsKey<TKey, TValue>(List<KeyValuePair<TKey, TValue>> arr, TKey key)
         {
@@ -310,6 +330,11 @@ namespace CliHelper
         }
         #endregion
 
+
+
+        /// <summary>
+        /// The passed command arguments
+        /// </summary>
         public string[] Arguments { get; private set; }
     }
 }
