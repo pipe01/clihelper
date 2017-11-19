@@ -323,9 +323,9 @@ namespace CliHelper
         /// <typeparam name="T">Command argument structure.</typeparam>
         /// <param name="programName">The program's command line name. If null, the first line is skipped.</param>
         /// <param name="spacing">The spacing between options and usage.</param>
-        /// <param name="multipleIndication">Append (+) to those commands that can be passed more than once.</param>
+        /// <param name="multipleMarker">Append (+) to those commands that can be passed more than once.</param>
         public static string GetCommandUsage<T>(string programName = null, int spacing = 4,
-            bool multipleIndication = true) where T : ArgumentStructure
+            bool multipleMarker = true) where T : ArgumentStructure
         {
             StringBuilder builder = new StringBuilder();
 
@@ -352,7 +352,7 @@ namespace CliHelper
                 line += space;
                 line += option.Usage;
 
-                if (option.CanAppearMultipleTimes && multipleIndication)
+                if (option.CanAppearMultipleTimes && multipleMarker)
                     line += " (+)";
 
                 builder.AppendLine(line);
@@ -381,5 +381,6 @@ namespace CliHelper
         /// The passed command arguments
         /// </summary>
         public IReadOnlyDictionary<string, string> Arguments { get; private set; }
+            = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
     }
 }
