@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Text;
 using System.Linq;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace CliHelper
 {
@@ -121,7 +122,7 @@ namespace CliHelper
             foreach (var prop in properties)
             {
                 //Skip the Arguments property
-                if (prop.Name == nameof(Arguments))
+                if (prop.Name == nameof(Arguments) || prop.Name == nameof(CommandConfiguration))
                     continue;
 
                 //Try to get OptionAttribute
@@ -212,28 +213,69 @@ namespace CliHelper
         /// <typeparam name="T"><see cref="Arguments"/> derived class.</typeparam>
         /// <param name="line">String line containing all the arguments.</param>
         /// <param name="options">Option array.</param>
+        /// <exception cref="ArgumentException"></exception>
         public static T Parse<T>(string line, Option[] options) where T : ArgumentStructure
         {
             Contract.Requires(options != null);
             Contract.Requires(line != null);
 
+            //Parse the line and get the values
             List<KeyValuePair<string, string>> reflectionValues = Parse(line, options)
                 .Select(o => new KeyValuePair<string, string>(o.Key?.Name, o.Value))
                 .ToList();
 
+            //Create an argument object instance 
             T argsInstance = Activator.CreateInstance(typeof(T)) as T;
 
+            //Get the parsed values that have a key. Those that don't will be command arguments.
             var filteredValues = reflectionValues
                 .Where(o => o.Key != null)
                 .ToList();
 
+            //Apply fields to the Arguments instance
             ApplyReflection(argsInstance, filteredValues);
 
-            argsInstance.Arguments = reflectionValues
-                .Where(o => o.Key == null)
-                .Select(o => o.Value)
-                .ToArray();
 
+            //Get command arguments
+            var arguments = reflectionValues
+                .Where(o => o.Key == null)
+                .Select(o => o.Value);
+
+            //Too many given arguments
+            if (arguments.Count() > argsInstance.CommandConfiguration.Arguments.Count)
+                throw new ArgumentException("Too many arguments.");
+
+            //Create a queue with the argument definitions
+            Queue<ArgumentDefinition> argumentQueue =
+                new Queue<ArgumentDefinition>(argsInstance.CommandConfiguration.Arguments);
+            
+            Dictionary<string, string> finalArguments = new Dictionary<string, string>();
+
+            //Loop through the user-given arguments
+            foreach (var item in arguments)
+            {
+                //Pop a definition from the queue
+                ArgumentDefinition def = argumentQueue.Dequeue();
+
+                //If the argument name is duplicated, throw
+                if (finalArguments.ContainsKey(def.Name))
+                    throw new ArgumentException($"Duplicate argument name '{def.Name}'");
+
+                //Set the argument value in the dictionary
+                finalArguments[def.Name] = item;
+            }
+
+            //Loop through the remaining unset argument definitions
+            foreach (var item in argumentQueue)
+            {
+                //If any definition is not optional, throw
+                if (!item.Optional)
+                    throw new ArgumentException($"Missing argument '{item.Name}'");
+            }
+
+            //Set the arguments in the object instance
+            argsInstance.Arguments = new ReadOnlyDictionary<string, string>(finalArguments);
+            
             return argsInstance;
         }
 
@@ -317,24 +359,27 @@ namespace CliHelper
             }
 
             return builder.ToString();
-        }
 
-        private static string GetLine(Option option)
-        {
-            string line = $"  -{option.ShortOption}";
+            string GetLine(Option option)
+            {
+                string line = $"  -{option.ShortOption}";
 
-            if (option.LongOption != null)
-                line += $", --{option.LongOption}";
-            
-            return line;
+                if (option.LongOption != null)
+                    line += $", --{option.LongOption}";
+
+                return line;
+            }
         }
         #endregion
 
-
+        /// <summary>
+        /// This command's configuration.
+        /// </summary>
+        public virtual Configuration CommandConfiguration { get; } = new Configuration();
 
         /// <summary>
         /// The passed command arguments
         /// </summary>
-        public string[] Arguments { get; private set; }
+        public IReadOnlyDictionary<string, string> Arguments { get; private set; }
     }
 }

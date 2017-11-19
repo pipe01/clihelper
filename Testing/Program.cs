@@ -16,6 +16,15 @@ namespace Testing
 
             [Option("e", "extract", "extract", "Extracts a file", true)]
             public string ExtractFile { get; set; }
+
+            public override Configuration CommandConfiguration => new Configuration
+            {
+                Arguments = new[]
+                {
+                    new ArgumentDefinition("file1", false),
+                    new ArgumentDefinition("file2", true)
+                }
+            };
         }
 
         static void Main(string[] args)
@@ -33,7 +42,7 @@ namespace Testing
 
             var result = parser.ParseAll("-h 'argumento lol' -e hola").ToList();*/
             
-            var margs = ArgumentStructure.Parse<MyArgs>("-h argumento lol hola");
+            var margs = ArgumentStructure.Parse<MyArgs>("-h argumento lol");
 
             if (margs.ShowHelp)
                 Console.WriteLine(ArgumentStructure.GetCommandUsage<MyArgs>());
